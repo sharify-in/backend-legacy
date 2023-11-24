@@ -1,0 +1,170 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String           @id @unique @default(uuid())
+  username          String           @unique
+  email             String           @unique
+  password          String
+  token             String           @unique
+  role              Role             @default(USER)
+  isAdmin           Boolean          @default(false)
+  beta              Boolean          @default(false)
+  invites           Int              @default(0)
+  uploads           Int              @default(0)
+  lastLogin         DateTime?
+  lastLoginIp       String?
+  registerDate      DateTime         @default(now())
+  registerIp        String?
+  invitedBy         String           @default("No one")
+  emailConfirmed    Boolean          @default(false)
+  blacklist         Blacklist?       @relation(fields: [blacklistId], references: [id])
+  blacklistId       String?          @unique
+  subscription      Subscription?    @relation(fields: [subscriptionId], references: [id])
+  subscriptionId    String?          @unique
+  discord           UserDiscord?     @relation(fields: [discordId], references: [id])
+  discordId         String?          @unique
+  settings          UserSettings?    @relation(fields: [settingsId], references: [id])
+  settingsId        String?          @unique
+  privacySettings   PrivacySettings? @relation(fields: [privacySettingsId], references: [id])
+  privacySettingsId String?          @unique
+  embedSettings     EmbedSettings?   @relation(fields: [embedSettingsId], references: [id])
+  embedSettingsId   String?
+  linkSettings      LinkSettings?    @relation(fields: [linkSettingsId], references: [id])
+  linkSettingsId    String?          @unique
+  removed           Boolean          @default(false)
+  invitedUsers      String[]         @default([])
+  storageUsed       Int              @default(0)
+}
+
+model Blacklist {
+  id     String  @id @default(cuid())
+  status Boolean @default(false)
+  reason String?
+  user   User?
+}
+
+model Subscription {
+  id            String    @id @default(cuid())
+  type          SubType?
+  subscribeDate DateTime?
+  expires       DateTime?
+  user          User?
+}
+
+model UserDiscord {
+  id           String  @id @default(cuid())
+  username     String?
+  refreshToken String?
+  avatar       String?
+  discordId    String?
+  User         User?
+}
+
+model UserSettings {
+  id      String  @id @default(cuid())
+  aboutme String? @default("Hi, I'm new here!")
+  User    User?
+}
+
+model PrivacySettings {
+  id                   String  @id @default(cuid())
+  privateProfile       Boolean @default(false)
+  showDiscordOnProfile Boolean @default(false)
+  showMatureDomains    Boolean @default(false)
+  User                 User?
+}
+
+model EmbedSettings {
+  id           String  @id @default(cuid())
+  enabled      Boolean @default(true)
+  color        String  @default("#0090ff")
+  providerName String  @default("sharify.in")
+  providerUrl  String  @default("https://sharify.in")
+  author       String  @default("[username]")
+  authorUrl    String  @default("https://sharify.in")
+  title        String  @default("This file is hosted on sharify.in")
+  description  String  @default("Uploaded by [username]")
+  User         User[]
+}
+
+model LinkSettings {
+  id        String  @id @default(cuid())
+  urlType   urlType @default(NORMAL)
+  subdomain String?
+  domain    String  @default("i.sharify.in")
+  User      User?
+}
+
+model State {
+  id         String  @id @unique @default(cuid())
+  beta       Boolean @default(false)
+  regEnabled Boolean @default(false)
+  inviteOnly Boolean @default(true)
+}
+
+model File {
+  filename         String   @id
+  originalFileName String
+  cdnUrl           String
+  mimeType         String
+  size             Int
+  uploadedAt       DateTime @default(now())
+  uploadedBy       String
+}
+
+model Invite {
+  code      String   @id @unique
+  used      Boolean  @default(false)
+  expires   DateTime
+  createdBy String
+  usedBy    String?
+}
+
+model Domain {
+  name      String   @id @unique
+  wildcard  Boolean
+  donated   Boolean
+  private   Boolean
+  mature    Boolean
+  dateadded DateTime @default(now())
+  donator   String   @unique
+}
+
+model Verification {
+  code    String   @id @unique @default(cuid())
+  owner   String   @unique
+  expires DateTime
+}
+
+model Announcements {
+  title       String   @id
+  description String
+  date        DateTime
+  author      String
+}
+
+enum Role {
+  USER
+  ADMIN
+  OWNER
+  TRAINEE
+  MODERATOR
+}
+
+enum SubType {
+  PLUS
+  PRO
+  ENTERPRISE
+}
+
+enum urlType {
+  NORMAL
+  RAW
+}
