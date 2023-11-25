@@ -1,3 +1,9 @@
+/*
+THIS ROUTER IS PASTED FROM OLD VARITY.PICS (sharify.in before merging with xello.blue) SOURCE CODE
+AND WAS NOT MADE TO BE USED WITH PRISMA WHICH ALSO MEANS THAT IT'S NOT PRODUCTION READY AND
+REQUIRES PARTIAL OR FULL REWRITE FOR IT TO HAVE ANY FUNCITONALITY
+*/
+
 // import { type FastifyInstance } from "fastify";
 
 // import { ZodTypeProvider } from "fastify-type-provider-zod";
